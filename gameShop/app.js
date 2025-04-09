@@ -4,7 +4,11 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 
-
+// Importera route filer
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const gameRoutes = require("./routes/gameRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 // Importera global felhantering
 const { notFound, errorHandler } = require("./middlewares/error");
@@ -15,7 +19,11 @@ app.use(cors());
 
 app.use(express.json());
 
-
+// Definiera API rutter
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/games", gameRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Felhantering 404 först, sedan generell felhantering
 app.use(notFound);
