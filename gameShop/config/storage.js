@@ -8,7 +8,7 @@ const storage = new Storage({
   // Credentials hämtas från miljövariabler
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.MYFILENAME.replace(/\\n/g, '\n'),
+    private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
   },
 });
 
@@ -20,7 +20,7 @@ const uploadImage = (file) => {
   return new Promise((resolve, reject) => {
     // Avbryt om ingen fil skickats
     if (!file) {
-      reject('No image file');
+      return reject('No image file');
     }
 
     // Skapa ett nytt filobjekt i GCS med unikt filnamn
