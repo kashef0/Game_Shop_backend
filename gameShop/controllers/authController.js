@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const generateToken = require('../utils/generateToken'); 
 const checkUserExists = require('../utils/checkUserExists')
+const validator = require('validator');
 // Registrera användare
 exports.register = async (req, res) => {
   try {
@@ -21,8 +22,8 @@ exports.register = async (req, res) => {
     if (!validator.isEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
     }
-
-    if (password.length < 8) {
+    
+    if (!validator.isLength(password, { min: 8 })) {
       return res.status(400).json({ message: 'Password must be at least 8 characters' });
     }
 
