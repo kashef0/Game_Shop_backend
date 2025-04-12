@@ -42,8 +42,12 @@ exports.updateProfile = async (req, res) => {
 
   // Om en ny profilbild är uppladdad, hantera uppladdningen
   if (req.file) {
-    const imageUrl = await uploadImage(req.file); 
-    user.profilePic = imageUrl;
+    try {
+      const imageUrl = await uploadImage(req.file);
+      user.profilePic = imageUrl;
+    } catch (err) {
+      return res.status(500).json({ message: 'Misslyckades att ladda upp bild' });
+    }
   }
 
   // Spara den uppdaterade användardokumentet
