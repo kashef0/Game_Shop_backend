@@ -128,3 +128,31 @@ exports.registerAdmin = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await checkUserExists(email);
+
+    if (!user || user.role !== 'admin') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const token = generateToken(user._id, user.role);
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
