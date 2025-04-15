@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 // Middleware för att skydda rutter  
-module.exports.protect = (req, res, next) => {
+module.exports.protect = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     // Kontrollera om Authorization header finns och börjar med "Bearer"
@@ -15,7 +15,10 @@ module.exports.protect = (req, res, next) => {
     try {
         // Verifiera token  
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ message: "Användaren hittades ej.." });
+        }
         // Spara användardata från token  
         req.user = decoded;
 
