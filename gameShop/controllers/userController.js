@@ -15,7 +15,8 @@ exports.getProfile = async (req, res) => {
 
 // Uppdatera användarprofil 
 exports.updateProfile = async (req, res) => {
-  const userId = req.params.id; 
+  const userId = req.user.id;
+
 
   
   if (req.user.id !== userId && req.user.role !== 'admin') {

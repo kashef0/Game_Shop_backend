@@ -7,9 +7,9 @@ const { getProfile, updateProfile, deleteProfile } = require('../controllers/use
 // Hämta användarens profil
 router.get('/profile', protect, getProfile);
 // Uppdatera användarens profil 
-router.put('/profile', protect, uploadProfilePic, updateProfile);
+router.put('/update_profile', protect, uploadProfilePic, updateProfile);
 
 // Ta bort användarens profil
-router.delete('/profile', protect, deleteProfile);  
+router.delete('/delete_profile', protect, deleteProfile);  
 
 module.exports = router;

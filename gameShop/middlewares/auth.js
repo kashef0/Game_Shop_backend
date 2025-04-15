@@ -21,7 +21,8 @@ module.exports.protect = async (req, res, next) => {
         }
         // Spara användardata från token  
         req.user = decoded;
-
+        console.log('Decoded token:', decoded);
+        console.log('Decoded token:', decoded);
         // Gå vidare  
         next();
     } catch (error) {
