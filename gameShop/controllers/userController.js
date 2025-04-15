@@ -41,24 +41,34 @@ exports.updateProfile = async (req, res) => {
   }
 
   // Om en ny profilbild är uppladdad, hantera uppladdningen
-  if (req.file) {
-    try {
-      const imageUrl = await uploadImage(req.file);
-      // radera gamla bild om det finns
-      if (user.profilePic) {
-        const oldFilename = user.profilePic.split('/').pop();
-        await bucket.file(`profile_pics/${oldFilename}`).delete().catch(console.error);
-      }
-      user.profilePic = imageUrl;
-    } catch (err) {
-      console.error('Image upload failed:', err);
-      return res.status(500).json({ 
-        success: false,
-        message: 'Image upload failed. Please try again.' 
-      });
+  try {
+    let updateFields = {};
+    
+    // Handle file upload
+    if (req.file) {
+      const imageUrl = await uploadImage(req.file); // Your GCS upload logic
+      updateFields.profilePic = imageUrl;
     }
-  }
 
+    // Handle other fields
+    if (req.body.name) updateFields.name = req.body.name;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      updateFields,
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: updatedUser
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
   // Spara den uppdaterade användardokumentet
   const updatedUser = await user.save();
 
