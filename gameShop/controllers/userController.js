@@ -5,25 +5,25 @@ const { uploadImage } = require('../config/storage');
 // Hämta användarprofil
 exports.getProfile = async (req, res) => {
   // Hämta användaren baserat på ID från den autentiserade användaren
-  const user = await User.findById(req.user.id).select('-password'); // Välj alla fält utom lösenordet
+  const user = await User.findById(req.user.id).select('-password');
   if (!user) {
     return res.status(404).json({ message: 'Användaren hittades inte' });
   }
-  // Skicka tillbaka användarens information som JSON
+  
   res.json(user);
 };
 
-// Uppdatera användarprofil (kan uppdatera namn, profilbild och lösenord)
+// Uppdatera användarprofil 
 exports.updateProfile = async (req, res) => {
-  const userId = req.params.id; // Hämta användarens ID från URL-parametern
+  const userId = req.params.id; 
 
-  // Kontrollera att användaren kan uppdatera sin egen profil eller om den är en admin
+  
   if (req.user.id !== userId && req.user.role !== 'admin') {
-    // Om användaren försöker uppdatera någon annan än sig själv, eller om hen inte är admin
+
     return res.status(403).json({ message: 'Inte behörig att uppdatera denna profil' });
   }
 
-  // Hämta användaren från databasen baserat på ID:t
+  // Hämta användaren från databasen baserat på ID
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({ message: 'Användaren hittades ej...' });
@@ -44,9 +44,18 @@ exports.updateProfile = async (req, res) => {
   if (req.file) {
     try {
       const imageUrl = await uploadImage(req.file);
+      // radera gamla bild om det finns
+      if (user.profilePic) {
+        const oldFilename = user.profilePic.split('/').pop();
+        await bucket.file(`profile_pics/${oldFilename}`).delete().catch(console.error);
+      }
       user.profilePic = imageUrl;
     } catch (err) {
-      return res.status(500).json({ message: 'Misslyckades att ladda upp bild' });
+      console.error('Image upload failed:', err);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Image upload failed. Please try again.' 
+      });
     }
   }
 
@@ -68,12 +77,11 @@ exports.deleteProfile = async (req, res) => {
   const userId = req.params.id; 
 
   // Kontrollera om den inloggade användaren försöker ta bort sitt eget konto eller om användaren är en admin
-  // En admin kan ta bort vilket användarkonto som helst, men vanliga användare kan bara ta bort sitt eget konto
   if (req.user.id !== userId && req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Inte auktoriserad att ta bort denna profil' });
   }
 
-  // Hitta användaren baserat på deras ID
+
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({ message: 'Användaren hittades inte' });

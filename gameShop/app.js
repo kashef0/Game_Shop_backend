@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const { Storage } = require('@google-cloud/storage');
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
@@ -28,6 +28,19 @@ app.use("/api/orders", orderRoutes);
 // Felhantering 404 först, sedan generell felhantering
 app.use(notFound);
 app.use(errorHandler);
+
+
+
+// Initial Google Cloud Storage
+const storage = new Storage({
+  projectId: process.env.PROJECT_ID,
+  credentials: {
+    client_email: process.env.CLIENT_EMAIL,
+    private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+  },
+});
+
+
 
 // Använd PORT från miljövariabel eller default 5000
 const PORT = process.env.PORT || 5000;
