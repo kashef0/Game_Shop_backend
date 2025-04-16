@@ -26,7 +26,9 @@ const uploadImage = async (file) => {
         metadata: { contentType: file.mimetype },
       });
 
-      blobStream.on('error', reject);
+      blobStream.on('error', (err) => {
+        reject(err); 
+      });
       blobStream.on('finish', resolve);
       blobStream.end(file.buffer);
     });

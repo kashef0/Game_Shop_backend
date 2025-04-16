@@ -13,14 +13,11 @@ exports.getProfile = async (req, res) => {
   res.json(user);
 };
 
-// Uppdatera användarprofil 
+// Uppdatera användarprofil
 exports.updateProfile = async (req, res) => {
   const userId = req.user.id;
 
-
-  
   if (req.user.id !== userId && req.user.role !== 'admin') {
-
     return res.status(403).json({ message: 'Inte behörig att uppdatera denna profil' });
   }
 
@@ -30,39 +27,51 @@ exports.updateProfile = async (req, res) => {
     return res.status(404).json({ message: 'Användaren hittades ej...' });
   }
 
+  // Definiera updateFields objekt för uppdatering av användarprofil
+  let updateFields = {};
+
   // Uppdatera de fält som är tillåtna namn, profilbild och lösenord
   if (req.body.name) {
-    user.name = req.body.name; 
+    updateFields.name = req.body.name; 
   }
 
   if (req.body.password) {
     // Om ett nytt lösenord skickas, skapa en salt och hash lösa det nya lösenordet
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(req.body.password, salt);
+    updateFields.password = await bcrypt.hash(req.body.password, salt);
   }
 
   // Om en ny profilbild är uppladdad, hantera uppladdningen
-  try {
-    let updateFields = {};
-    
-    // Handle file upload
-    if (req.file) {
-      const imageUrl = await uploadImage(req.file); // Your GCS upload logic
+  if (req.file) {
+    try {
+      const imageUrl = await uploadImage(req.file); 
       updateFields.profilePic = imageUrl;
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
+  }
 
-    // Handle other fields
-    if (req.body.name) updateFields.name = req.body.name;
-    
+  // Uppdatera användaren med de fält som har ändrats
+  try {
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       updateFields,
       { new: true }
     );
 
+    // Returnera den uppdaterade användarens information
     res.status(200).json({
       success: true,
-      data: updatedUser
+      data: {
+        _id: updatedUser._id, 
+        name: updatedUser.name, 
+        email: updatedUser.email, 
+        profilePic: updatedUser.profilePic, 
+        role: updatedUser.role,
+      }
     });
   } catch (error) {
     res.status(500).json({
@@ -70,17 +79,6 @@ exports.updateProfile = async (req, res) => {
       message: error.message
     });
   }
-  // Spara den uppdaterade användardokumentet
-  // const updatedUser = await user.save();
-
-  // Returnera den uppdaterade användarens information
-  res.json({
-    _id: updatedUser._id, 
-    name: updatedUser.name, 
-    email: updatedUser.email, 
-    profilePic: updatedUser.profilePic, 
-    role: updatedUser.role,
-  });
 };
 
 // Ta bort användarprofil både användare och admin
