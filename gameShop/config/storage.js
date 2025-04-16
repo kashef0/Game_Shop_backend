@@ -27,16 +27,25 @@ const uploadImage = async (file) => {
       });
 
       blobStream.on('error', (err) => {
-        reject(err); 
+        console.error('GCS Stream Error:', err); // Log detailed error
+        reject(new Error('Failed to upload image to Google Cloud'));
       });
-      blobStream.on('finish', resolve);
+
+      blobStream.on('finish', () => {
+        console.log('Upload successful:', filename);
+        resolve();
+      });
+
       blobStream.end(file.buffer);
     });
-
+    await blob.makePublic();
     return `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
   } catch (err) {
-    console.error('GCS Upload Error:', err);
-    throw new Error('Failed to upload image');
+    console.error('GCS Upload Failed:', {
+      error: err.message,
+      stack: err.stack,
+    });
+    throw err; 
   }
 };
 

@@ -16,6 +16,8 @@ exports.getProfile = async (req, res) => {
 // Uppdatera användarprofil
 exports.updateProfile = async (req, res) => {
   const userId = req.user.id;
+  console.log('FILE:', req.file);
+console.log('BODY:', req.body);
 
   if (req.user.id !== userId && req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Inte behörig att uppdatera denna profil' });

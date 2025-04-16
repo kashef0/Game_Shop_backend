@@ -27,25 +27,23 @@ const upload = multer({
 const uploadProfilePic = (req, res, next) => {
   console.log('Middleware triggered');
   upload.single('profilePic')(req, res, (err) => {
-    
-
+  
     if (err) {
-      // Handle different error types
-      let message = 'File upload failed';
-      
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        message = 'File too large (max 5MB)';
-      } else if (err.message.includes('Invalid file type')) {
-        message = err.message;
-      }
-
+      console.error('Multer Error:', {
+        code: err.code,
+        message: err.message,
+      });
       return res.status(400).json({ 
         success: false,
-        message 
+        message: err.message 
       });
     }
-    console.log('Uploaded File:', req.file);
-    // Proceed if no errors
+
+    console.log('Multer Success - File:', {
+      originalname: req.file?.originalname,
+      mimetype: req.file?.mimetype,
+      size: req.file?.size,
+    });
     next();
   });
 };
