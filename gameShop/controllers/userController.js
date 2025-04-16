@@ -71,7 +71,7 @@ exports.updateProfile = async (req, res) => {
     });
   }
   // Spara den uppdaterade användardokumentet
-  const updatedUser = await user.save();
+  // const updatedUser = await user.save();
 
   // Returnera den uppdaterade användarens information
   res.json({

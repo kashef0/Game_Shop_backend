@@ -6,12 +6,10 @@ const storage = multer.memoryStorage();
 
 // Filtrera tillåtna filtyper endast bilder tillåts
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  
-  if (allowedTypes.includes(file.mimetype)) {
+  if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed'), false);
+    cb(new Error('Only images are allowed'), false);
   }
 };
 
@@ -27,7 +25,10 @@ const upload = multer({
 
 // hantera enstaka filuppladdning med fältnamn profilePic 
 const uploadProfilePic = (req, res, next) => {
+  console.log('Middleware triggered');
   upload.single('profilePic')(req, res, (err) => {
+    
+
     if (err) {
       // Handle different error types
       let message = 'File upload failed';
@@ -43,7 +44,7 @@ const uploadProfilePic = (req, res, next) => {
         message 
       });
     }
-    
+    console.log('Uploaded File:', req.file);
     // Proceed if no errors
     next();
   });
