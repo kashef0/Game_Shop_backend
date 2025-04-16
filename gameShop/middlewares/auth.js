@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const User = require('../models/User');
 // Middleware för att skydda rutter  
 module.exports.protect = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -21,8 +21,6 @@ module.exports.protect = async (req, res, next) => {
         }
         // Spara användardata från token  
         req.user = decoded;
-        console.log('Decoded token:', decoded);
-        console.log('Decoded token:', decoded);
         // Gå vidare  
         next();
     } catch (error) {
