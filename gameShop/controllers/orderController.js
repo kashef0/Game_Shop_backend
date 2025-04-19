@@ -4,10 +4,14 @@ const Game = require("../models/Game");
 // Skapa ny beställning
 exports.createOrder = async (req, res) => {
   try {
-    const { items, paymentMethod } = req.body;  
+    const { items, paymentMethod, name, email, address, telefon } = req.body;  
 
     if (!items || items.length === 0) {  
       return res.status(400).json({ message: "Inga beställningsartiklar" });
+    }
+
+    if (!name || !email || !address) {
+      return res.status(400).json({ message: "Alla användaruppgifter måste fyllas i" });
     }
 
     let totalPrice = 0;  
@@ -67,6 +71,10 @@ exports.createOrder = async (req, res) => {
     // Skapa beställningen i databasen
     const order = new Order({
       user: req.user.id,
+      name,
+      email,
+      address,
+      telefon,
       items: orderItems,
       totalPrice,
       paymentMethod,

@@ -33,6 +33,22 @@ const orderSchema = new mongoose.Schema(
       ref: 'User',
       required: true
     },
+    name: {
+      type: String,
+      required: true,  
+    },
+    email: {
+      type: String,
+      required: true,  
+      match: [/.+\@.+\..+/, 'Please fill a valid email address'] 
+    },
+    address: {
+      type: String,
+      required: true,  
+    },
+    telefon: {
+      type: String,
+    },
     items: [orderItemSchema],
     totalPrice: {
       type: Number,
