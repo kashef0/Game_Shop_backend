@@ -32,38 +32,52 @@ exports.getGameById = async (req, res) => {
 // Lägg till eller uppdatera spel
 exports.addOrUpdateGame = async (req, res) => {
   try {
-    // Validera användarrollen för adminåtkomst
+    // admin kan hantera denna funktion
     if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Ej auktoriserad' });
+      return res.status(403).json({ message: 'Inte auktoriserad att lägga till eller uppdatera spel' });
     }
 
-    const { rawgId, price, rentalPrice, stock, availableForRent } = req.body;
+    // Extrahera de olika fälten från request kroppen
+    const { 
+      rawgId, 
+      title, 
+      coverImage, 
+      platforms, 
+      genres, 
+      releaseDate,
+      price,
+      rentalPrice,
+      stock,
+      availableForRent
+    } = req.body;
 
-    // Kontrollera om spelet med rawgId redan finns
+    // Kolla om ett spel med samma rawgId redan finns
     let game = await Game.findOne({ rawgId });
 
-    // Om spelet inte finns, skapa ett nytt spelobjekt
     if (!game) {
+      // Om inget spel med detta rawgId finns, skapa ett nytt spel
       game = new Game({ rawgId });
     }
 
-    // Uppdatera spelet med de data som mottagits från frontend (pris, hyrespris, lager, etc.)
+    // Uppdatera spelets olika fält med de nya värdena från requesten
+    game.title = title;
+    game.coverImage = coverImage;
+    game.platforms = platforms;
+    game.genres = genres;
+    game.releaseDate = releaseDate;
     game.price = price;
     game.rentalPrice = rentalPrice;
     game.stock = stock;
     game.availableForRent = availableForRent;
-    game.isActive = true; // Markera spelet som aktivt
+    game.isActive = true; 
 
-    // Spara eller uppdatera spelet i databasen
+    // Spara spelet i databasen
     const savedGame = await game.save();
-
-    return res.status(201).json(savedGame);
+    res.status(201).json(savedGame); 
   } catch (error) {
-    console.error(error);
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
-
 
 // Växla spelets status
 exports.toggleGameStatus = async (req, res) => {
