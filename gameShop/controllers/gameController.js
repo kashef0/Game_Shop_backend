@@ -48,7 +48,11 @@ exports.addOrUpdateGame = async (req, res) => {
       price,
       rentalPrice,
       stock,
-      availableForRent
+      availableForRent,
+      metacritic,  
+      rating,      
+      updated,     
+      shortScreenshots 
     } = req.body;
 
     // Kolla om ett spel med samma rawgId redan finns
@@ -69,7 +73,11 @@ exports.addOrUpdateGame = async (req, res) => {
     game.rentalPrice = rentalPrice;
     game.stock = stock;
     game.availableForRent = availableForRent;
-    game.isActive = true; 
+    game.metacritic = metacritic; 
+    game.rating = rating;         
+    game.updated = updated;       
+    game.shortScreenshots = shortScreenshots;
+    game.isActive = true;
 
     // Spara spelet i databasen
     const savedGame = await game.save();
