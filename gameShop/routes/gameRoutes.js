@@ -15,6 +15,7 @@ router.get('/:id', getGameById); // Hämtar ett spel med ett specifikt ID
 
 // Admin rutter: Skyddade med protect och admi 
 router.post('/', protect, admin, addOrUpdateGame); // Lägg till eller uppdatera spel
+router.put('/:id', protect, admin, updateAllGameData); // update alla spel data
 router.put('/:id/status', protect, admin, toggleGameStatus); // Växla spelets status 
 router.delete('/:id', protect, admin, deleteGame); // Ta bort ett spel 
 

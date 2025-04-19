@@ -4,8 +4,11 @@ const { admin } = require('../middlewares/auth');
 // Hämta alla aktiva spel
 exports.getGames = async (req, res) => {
   try {
+    const isAdmin = req.user && req.user.role === 'admin';
+
+    const filter = isAdmin ? {} : { isActive: true };
     // Hämta alla spel som är aktiva
-    const games = await Game.find({ isActive: true });
+    const games = await Game.find(filter);
     res.json(games); 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -32,10 +35,12 @@ exports.getGameById = async (req, res) => {
 // Lägg till eller uppdatera spel
 exports.addOrUpdateGame = async (req, res) => {
   try {
+    // admin kan hantera denna funktion
     if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Unauthorized' });
+      return res.status(403).json({ message: 'Inte auktoriserad att lägga till eller uppdatera spel' });
     }
 
+    // Extrahera de olika fälten från request kroppen
     const {
       rawgId,
       price,
@@ -45,24 +50,29 @@ exports.addOrUpdateGame = async (req, res) => {
       isActive
     } = req.body;
 
-    if (!rawgId || price == null || rentalPrice == null || stock == null) {
-      return res.status(400).json({ message: 'all fields is required' });
+    // kontrollera om spel finns 
+    if (!rawgId) {
+      return res.status(400).json({ message: 'game not exist' });
     }
 
+    // Kolla om ett spel med samma rawgId redan finns
     let game = await Game.findOne({ rawgId });
 
     if (!game) {
+      // Om inget spel med detta rawgId finns, skapa ett nytt spel
       game = new Game({ rawgId });
     }
 
+    // Uppdatera spelets olika fält med de nya värdena från requesten
     game.price = price;
     game.rentalPrice = rentalPrice;
     game.stock = stock;
     game.availableForRent = availableForRent ?? false;
     game.isActive = isActive ?? true;
 
+    // Spara spelet i databasen
     const savedGame = await game.save();
-    res.status(201).json(savedGame);
+    res.status(201).json(savedGame); 
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
