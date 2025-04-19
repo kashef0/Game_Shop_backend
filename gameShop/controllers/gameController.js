@@ -32,56 +32,37 @@ exports.getGameById = async (req, res) => {
 // Lägg till eller uppdatera spel
 exports.addOrUpdateGame = async (req, res) => {
   try {
-    // admin kan hantera denna funktion
     if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Inte auktoriserad att lägga till eller uppdatera spel' });
+      return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    // Extrahera de olika fälten från request kroppen
-    const { 
-      rawgId, 
-      title, 
-      coverImage, 
-      platforms, 
-      genres, 
-      releaseDate,
+    const {
+      rawgId,
       price,
       rentalPrice,
       stock,
       availableForRent,
-      metacritic,  
-      rating,      
-      updated,     
-      shortScreenshots 
+      isActive
     } = req.body;
 
-    // Kolla om ett spel med samma rawgId redan finns
+    if (!rawgId || price == null || rentalPrice == null || stock == null) {
+      return res.status(400).json({ message: 'all fields is required' });
+    }
+
     let game = await Game.findOne({ rawgId });
 
     if (!game) {
-      // Om inget spel med detta rawgId finns, skapa ett nytt spel
       game = new Game({ rawgId });
     }
 
-    // Uppdatera spelets olika fält med de nya värdena från requesten
-    game.title = title;
-    game.coverImage = coverImage;
-    game.platforms = platforms;
-    game.genres = genres;
-    game.releaseDate = releaseDate;
     game.price = price;
     game.rentalPrice = rentalPrice;
     game.stock = stock;
-    game.availableForRent = availableForRent;
-    game.metacritic = metacritic; 
-    game.rating = rating;         
-    game.updated = updated;       
-    game.shortScreenshots = shortScreenshots;
-    game.isActive = true;
+    game.availableForRent = availableForRent ?? false;
+    game.isActive = isActive ?? true;
 
-    // Spara spelet i databasen
     const savedGame = await game.save();
-    res.status(201).json(savedGame); 
+    res.status(201).json(savedGame);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
