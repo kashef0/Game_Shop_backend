@@ -33,7 +33,7 @@ exports.getGameById = async (req, res) => {
 };
 
 // Lägg till eller uppdatera spel
-exports.addOrUpdateGame = async (req, res) => {
+exports.addGame = async (req, res) => {
   try {
     // admin kan hantera denna funktion
     if (req.user.role !== 'admin') {
@@ -56,27 +56,61 @@ exports.addOrUpdateGame = async (req, res) => {
     }
 
     // Kolla om ett spel med samma rawgId redan finns
-    let game = await Game.findOne({ rawgId });
-
-    if (!game) {
-      // Om inget spel med detta rawgId finns, skapa ett nytt spel
-      game = new Game({ rawgId });
+    const existing = await Game.findOne({ rawgId });
+    if (existing) {
+      return res.status(400).json({ message: 'Game already exists' });
     }
+    const newGame = new Game({
+      rawgId,
+      price,
+      rentalPrice,
+      stock,
+      availableForRent,
+      isActive
 
-    // Uppdatera spelets olika fält med de nya värdena från requesten
-    game.price = price;
-    game.rentalPrice = rentalPrice;
-    game.stock = stock;
-    game.availableForRent = availableForRent ?? false;
-    game.isActive = isActive ?? true;
+    })
 
     // Spara spelet i databasen
-    const savedGame = await game.save();
+    const savedGame = await newGame.save();
     res.status(201).json(savedGame); 
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+exports.updateGame = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const game = await Game.findById(req.params.id);
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    const {
+      price,
+      rentalPrice,
+      stock,
+      availableForRent,
+      isActive,
+    } = req.body;
+
+    game.price = price ?? game.price;
+    game.rentalPrice = rentalPrice ?? game.rentalPrice;
+    game.stock = stock ?? game.stock;
+    game.availableForRent = availableForRent ?? game.availableForRent;
+    game.isActive = isActive ?? game.isActive;
+
+    const updated = await game.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 // Växla spelets status
 exports.toggleGameStatus = async (req, res) => {
