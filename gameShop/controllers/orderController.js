@@ -93,7 +93,7 @@ exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate("user", "name email")  // Hämta användarens namn och email
-      .populate("items.game", "title coverImage");  // Hämta spelets titel och bild
+      .populate("items.game");  // Hämta spelets titel och bild
 
     if (!order) {
       return res.status(404).json({ message: "Ordern hittades inte" }); 
