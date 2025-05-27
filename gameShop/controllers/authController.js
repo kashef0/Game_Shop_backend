@@ -150,6 +150,7 @@ exports.loginAdmin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      profilePic: user.profilePic,
       token,
     });
   } catch (error) {
