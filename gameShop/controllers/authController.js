@@ -62,13 +62,13 @@ exports.login = async (req, res) => {
     // Kontrollera om användaren finns i databasen
     const user = await checkUserExists(email);
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     // Jämför lösenordet med det hashade lösenordet i databasen
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     // Generera JWT token för den inloggade användaren
@@ -135,12 +135,12 @@ exports.loginAdmin = async (req, res) => {
     const user = await checkUserExists(email);
 
     if (!user || user.role !== 'admin') {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Access denied. Only admin are allowed to log in.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const token = generateToken(user._id, user.role);
