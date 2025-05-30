@@ -9,7 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const gameRoutes = require("./routes/gameRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-
+const messageRoutes = require('./routes/messageRoutes')
 // Importera global felhantering
 const { notFound, errorHandler } = require("./middlewares/error");
 
@@ -24,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/games", gameRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/message", messageRoutes);
 
 // Felhantering 404 först, sedan generell felhantering
 app.use(notFound);
