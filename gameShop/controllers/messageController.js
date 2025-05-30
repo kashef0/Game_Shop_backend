@@ -17,7 +17,7 @@ exports.getUserMessages = async (req, res) => {
 exports.getAllMessages = async (req, res) => {
   try {
     // Hämta alla meddelanden sorterade efter nyast först
-    const messages = await Message.find().sort({ createdAt: -1 });
+    const messages = await Message.find().sort({ createdAt: -1 }).populate('userId', 'name email');
     res.json(messages);
   } catch (error) {
     res.status(500).json({ message: error.message });
