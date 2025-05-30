@@ -72,9 +72,15 @@ exports.addGame = async (req, res) => {
 
     // Spara spelet i databasen
     const savedGame = await newGame.save();
-    res.status(201).json(savedGame); 
+    res.status(201).json({
+  message: 'Game saved successfully',
+  data: savedGame
+});
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+     if (err.name === 'ValidationError') {
+    const messages = Object.values(err.errors).map(e => e.message);
+    return res.status(400).json({ errors: messages });
   }
 };
 
@@ -105,7 +111,11 @@ exports.updateGame = async (req, res) => {
     game.isActive = isActive ?? game.isActive;
 
     const updated = await game.save();
-    res.json(updated);
+    res.status(200).json({
+      message: 'Game updated successfully',
+      data: updated
+    });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
