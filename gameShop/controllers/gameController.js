@@ -78,6 +78,7 @@ exports.addGame = async (req, res) => {
       const messages = Object.values(err.errors).map((e) => e.message);
       return res.status(400).json({ errors: messages });
     }
+    return res.status(500).json({ message: error.message });
   }
 };
 
