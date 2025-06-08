@@ -1,27 +1,34 @@
-# Speluthyrning & Försäljning API
+# 🎮 Game Shop – Backend API
 
-Det här är ett RESTful API för ett system där användare kan köpa och hyra spel. Administratörer kan hantera spel, beställningar och användare medan vanliga användare kan skapa beställningar och hantera sina konton.
+Detta är ett RESTful API byggt med Node.js, Express och MongoDB för att hantera en spelplattform där användare kan köpa eller hyra spel, och administratörer kan hantera spel, beställningar och användare.
 
-## Funktioner
+---
 
-- **Användarhantering**
-  - Registrera, logga in och autentisera med JWT.
-  - Uppdatera användarprofiler.
-  - Ta bort användarkonton (endast användaren själv eller administratör).
-  
-- **Spelhantering (Admin)**
-  - Lägg till, uppdatera och ta bort spel.
-  - Växla status på spel (aktiv/inaktiv).
-  
-- **Beställningar**
-  - Skapa och hantera beställningar för köp och uthyrning av spel.
-  - Admin kan hämta alla beställningar och markera dem som levererade.
-  - Admin kan ta bort beställningar.
+## ✨ Funktioner
+
+### 👤 Användarhantering
+
+- ✅ Registrera, logga in och autentisera med JWT
+- ✏️ Uppdatera användarprofiler
+- ❌ Ta bort användarkonton (endast användaren själv eller administratör)
+
+### 🎮 Spelhantering (Admin)
+
+- ➕ Lägg till, uppdatera och ta bort spel
+- 🔁 Växla status på spel (aktiv/inaktiv)
+
+### 📦 Beställningar
+
+- 🛒 Skapa och hantera beställningar för köp och uthyrning av spel
+- 📬 Admin kan hämta alla beställningar och markera dem som levererade
+- 🗑️ Admin kan ta bort beställningar
+
+---
 
 
-## API Endpoints
+## 🔗 API Endpoints
 
-### Användarrelaterade rutter
+### 👤 Användarrelaterade rutter
 
 - **POST** `/api/users/register`: Registrera en ny användare.
 - **POST** `/api/users/login`: Logga in och få en JWT-token.
@@ -29,14 +36,14 @@ Det här är ett RESTful API för ett system där användare kan köpa och hyra 
 - **PUT** `/api/users/profile/:id`: Uppdatera användarens profil.
 - **DELETE** `/api/users/profile/:id`: Ta bort användarens konto (endast admin eller användaren själv).
 
-### Spelrelaterade rutter
+### 🎮 Spelrelaterade rutter
 
 - **GET** `/api/games`: Hämta alla aktiva spel.
 - **GET** `/api/games/:id`: Hämta ett spel baserat på ID.
 - **POST** `/api/games`: Lägg till eller uppdatera ett spel (endast admin).
 - **PUT** `/api/games/:id/status`: Växla spelets status (endast admin).
 
-### Beställningsrelaterade rutter
+### 📦 Beställningsrelaterade rutter
 
 - **POST** `/api/orders`: Skapa en ny beställning.
 - **GET** `/api/orders/myorders`: Hämta alla beställningar för den inloggade användaren.
@@ -45,19 +52,23 @@ Det här är ett RESTful API för ett system där användare kan köpa och hyra 
 - **PUT** `/api/orders/:id/deliver`: Uppdatera en beställning till levererad (endast admin).
 - **DELETE** `/api/orders/:id`: Ta bort en beställning (endast admin).
 
-## Middleware
+---
+
+## 🛡️ Middleware
 
 Projektet använder följande middleware för att skydda vissa rutter:
 
-- **protect**: Skyddar rutter som kräver att användaren är inloggad.
-- **admin**: Skyddar rutter som kräver administratörsbehörighet.
+- `protect`: 🔐 Skyddar rutter som kräver att användaren är inloggad
+- `admin`: 🛑 Skyddar rutter som kräver administratörsbehörighet
 
-## Teknologier
+## 🧰 Teknologier
 
-- Node.js
-- Express
-- MongoDB (Mongoose)
-- JWT (JSON Web Token) för autentisering
-- Multer för filuppladdning (profilbilder)
+- 🟢 Node.js  
+- 🚂 Express  
+- 🍃 MongoDB (Mongoose)  
+- 🔑 JWT (JSON Web Token) för autentisering  
+- 🖼️ Multer för filuppladdning (profilbilder)  
+
+---
 
 
