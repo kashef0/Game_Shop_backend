@@ -7,7 +7,7 @@ exports.getProfile = async (req, res) => {
   // Hämta användaren baserat på ID från den autentiserade användaren
   const user = await User.findById(req.user.id).select('-password');
   if (!user) {
-    return res.status(404).json({ message: 'Användaren hittades inte' });
+    return res.status(404).json({ message: 'User not found' });
   }
   
   res.json(user);
@@ -20,13 +20,13 @@ exports.updateProfile = async (req, res) => {
 console.log('BODY:', req.body);
 
   if (req.user.id !== userId && req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Inte behörig att uppdatera denna profil' });
+    return res.status(403).json({ message: 'Not authorized to update this profile' });
   }
 
   // Hämta användaren från databasen baserat på ID
   const user = await User.findById(userId);
   if (!user) {
-    return res.status(404).json({ message: 'Användaren hittades ej...' });
+    return res.status(404).json({ message: 'User not found...' });
   }
 
   // Definiera updateFields objekt för uppdatering av användarprofil
@@ -89,22 +89,22 @@ exports.deleteProfile = async (req, res) => {
 
   // Kontrollera om den inloggade användaren försöker ta bort sitt eget konto eller om användaren är en admin
   if (req.user.id !== userId && req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Inte auktoriserad att ta bort denna profil' });
+    return res.status(403).json({ message: 'Not authorized to delete this profile' });
   }
 
 
   const user = await User.findById(userId);
   if (!user) {
-    return res.status(404).json({ message: 'Användaren hittades inte' });
+    return res.status(404).json({ message: 'User not found' });
   }
 
   // Om användaren är en admin kan de ta bort vilket konto som helst 
   if (req.user.role === 'admin' && req.user.id !== userId) {
     await user.deleteOne(); 
-    return res.json({ message: 'Användare borttagen av admin' });
+    return res.json({ message: 'User removed by admin' });
   }
 
   // Om användaren tar bort sitt eget konto
   await user.deleteOne();
-  res.json({ message: 'Användare borttagen' });
+  res.json({ message: 'User deleted' });
 };

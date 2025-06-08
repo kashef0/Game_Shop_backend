@@ -11,7 +11,8 @@ exports.getGames = async (req, res) => {
     const games = await Game.find(filter);
     res.json(games);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -23,12 +24,13 @@ exports.getGameById = async (req, res) => {
 
     if (!game) {
       // Om spelet inte hittas, returnera felmeddelandet
-      return res.status(404).json({ message: "Spelet hittades inte" });
+      return res.status(404).json({ message: "Game not found" });
     }
 
     res.json(game);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -107,7 +109,8 @@ exports.updateGame = async (req, res) => {
       data: updated,
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(error);
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -118,7 +121,7 @@ exports.toggleGameStatus = async (req, res) => {
     if (req.user.role !== "admin") {
       return res
         .status(403)
-        .json({ message: "Inte auktoriserad att växla status för spel" });
+        .json({ message: "Not authorized to change game status" });
     }
 
     // Hämta spelet med ID från URL parametern
@@ -126,7 +129,7 @@ exports.toggleGameStatus = async (req, res) => {
 
     if (!game) {
       // Om spelet inte hittas, returnera felmeddelande
-      return res.status(404).json({ message: "Spelet hittades ej..." });
+      return res.status(404).json({ message: "Game not found..." });
     }
 
     // Växla spelets isActive status om det är aktivt blir det inaktivt och vice versa
@@ -135,7 +138,8 @@ exports.toggleGameStatus = async (req, res) => {
 
     res.json(game);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -146,19 +150,20 @@ exports.deleteGame = async (req, res) => {
     if (req.user.role !== "admin") {
       return res
         .status(403)
-        .json({ message: "Inte auktoriserad att ta bort spel" });
+        .json({ message: "Not authorized to remove games" });
     }
 
     const game = await Game.findById(req.params.id);
 
     if (!game) {
-      return res.status(404).json({ message: "Spelet hittades ej" });
+      return res.status(404).json({ message: "Game not found..." });
     }
 
     await game.deleteOne();
 
-    res.json({ message: "Spelet borttaget" });
+    res.json({ message: "Game removed" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };

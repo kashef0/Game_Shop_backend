@@ -7,13 +7,13 @@ exports.createOrder = async (req, res) => {
     const { items, paymentMethod, name, email, address, telefon } = req.body;
 
     if (!items || items.length === 0) {
-      return res.status(400).json({ message: "Inga beställningsartiklar" });
+      return res.status(400).json({ message: "No order items provided" });
     }
 
     if (!name || !email || !address) {
       return res
         .status(400)
-        .json({ message: "Alla användaruppgifter måste fyllas i" });
+        .json({ message: "All user details must be filled in" });
     }
 
     let totalPrice = 0;
@@ -24,18 +24,18 @@ exports.createOrder = async (req, res) => {
       const game = await Game.findById(item.game); // Hämtar spelet baserat på spelets ID
 
       if (!game) {
-        return res.status(404).json({ message: `spelet hittades inte` });
+        return res.status(404).json({ message: `Game could not be found` });
       }
 
       // Kontrollera om spelet är tillgängligt för uthyrning om det är en uthyrning
       if (item.isRental && !game.availableForRent) {
-        return res.status(400).json({ message: "Spelet finns inte att hyra" });
+        return res.status(400).json({ message: "Game is not available for rent" });
       }
 
       // Kontrollera om det finns tillräckligt med lager
       if (game.stock < item.quantity) {
         return res.status(400).json({
-          message: `Spelet ${game.name} Inte tillräckligt med lager, kontakta kundtjänsten`,
+          message: `Game ${game.name} Not enough stock, please contact customer service`,
         });
       }
 
@@ -80,7 +80,8 @@ exports.createOrder = async (req, res) => {
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -92,7 +93,7 @@ exports.getOrderById = async (req, res) => {
       .populate("items.game"); // Hämta spelets titel och bild
 
     if (!order) {
-      return res.status(404).json({ message: "Ordern hittades inte" });
+      return res.status(404).json({ message: "Order not found..." });
     }
 
     // Kontrollera om användaren äger beställningen eller om användaren är admin
@@ -100,12 +101,13 @@ exports.getOrderById = async (req, res) => {
       order.user._id.toString() !== req.user.id &&
       req.user.role !== "admin"
     ) {
-      return res.status(401).json({ message: "Ej auktoriserad" });
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     res.json(order); // Skicka tillbaka beställningen
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -118,7 +120,8 @@ exports.getMyOrders = async (req, res) => {
 
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -132,7 +135,8 @@ exports.getOrders = async (req, res) => {
 
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -142,7 +146,7 @@ exports.updateOrderToDelivered = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (!order) {
-      return res.status(404).json({ message: "Ordern hittades inte" });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     order.isDelivered = true; // Markera beställningen som levererad
@@ -151,7 +155,8 @@ exports.updateOrderToDelivered = async (req, res) => {
     const updatedOrder = await order.save(); // Spara den uppdaterade beställningen
     res.json(updatedOrder); // Skicka tillbaka den uppdaterade beställningen
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -161,21 +166,22 @@ exports.deleteOrder = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (!order) {
-      return res.status(404).json({ message: "Ordern hittades inte" });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     // Kontrollera om den inloggade användaren är admin
     if (req.user.role !== "admin") {
       return res
         .status(403)
-        .json({ message: "Du har inte behörighet att ta bort denna order" });
+        .json({ message: "You do not have permission to delete this order." });
     }
 
     await order.deleteOne();
 
     // Skicka tillbaka ett meddelande om att ordern har tagits bort
-    res.json({ message: "Ordern har tagits bort" });
+    res.json({ message: "The order has been removed." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
